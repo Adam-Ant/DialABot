@@ -1,0 +1,39 @@
+# This file replaces the default system.pa file provided by Debian
+### Automatically restore the volume of streams and devices
+load-module module-device-restore
+load-module module-stream-restore
+load-module module-card-restore
+
+### Automatically load driver modules depending on the hardware available
+.ifexists module-udev-detect.so
+load-module module-udev-detect
+.else
+### Use the static hardware detection module (for systems that lack udev/hal support)
+load-module module-detect
+.endif
+
+### Load several protocols
+.ifexists module-esound-protocol-unix.so
+load-module module-esound-protocol-unix
+.endif
+load-module module-native-protocol-unix auth-anonymous=1
+
+### Automatically restore the default sink/source when changed by the user
+### during runtime
+### NOTE: This should be loaded as early as possible so that subsequent modules
+### that look up the default sink/source get the right value
+load-module module-default-device-restore
+
+### Make sure we always have a sink around, even if it is a null sink.
+load-module module-always-sink
+
+### Enable positioned event sounds
+load-module module-position-event-sounds
+
+load-module module-null-sink sink_name=TeamspeakPlayback  sink_properties=device.description=TeamspeakPlayback
+load-module module-remap-source master=TeamspeakPlayback.monitor source_name=VoipInput source_properties="device.description=VoipInput"
+set-default-source VoipInput
+
+load-module module-null-sink sink_name=VoipOutput  sink_properties=device.description=VoipOutput
+load-module module-remap-source master=VoipOutput.monitor source_name=TeamspeakCapture source_properties="device.description=TeamspeakCapture"
+set-default-sink VoipOutput

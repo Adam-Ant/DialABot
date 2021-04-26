@@ -1,0 +1,5 @@
+--id sip:username@provider.tld
+--registrar sip:provider.tld
+--username username
+--password password
+--reg-timeout 600

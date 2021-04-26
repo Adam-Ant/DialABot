@@ -1,0 +1,14 @@
+#!/bin/sh
+set -e
+
+mkdir -p /run/dbus /config/ts3client
+
+dbus-daemon --system --print-address --fork
+
+pulseaudio --exit-idle-time=-1 --disallow-exit=yes --system --daemonize --disallow-module-loading
+
+pjsua --realm="*" --auto-answer 200 --log-level 3 --no-cli-console --use-cli --config-file /config/pjsua.cfg &
+
+# This probably could be inlined and shrunk, but lets be honest this isn't exactly a lightweight solution already.
+# I also don't like this HOME hack, but Teamspeak doesn't give us much option.
+HOME=/config/ts3client xvfb-run -f /root/.Xauthority /opt/teamspeak/ts3client_runscript.sh --no-sandbox
